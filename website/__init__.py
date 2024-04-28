@@ -40,7 +40,7 @@ def flask_app():
     
     #craeate database
     create_database(app)
-
+    
     return app
 
 # Create database function

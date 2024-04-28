@@ -15,7 +15,7 @@
         <option value="15">15</option>
         <option value="20">20</option>
     </select>
-    <br/><br/>
+    <br/>
     <label for="sort-by">Sort by:</label>
     <select id="sort-by">
         <option value="game_name_asc">Game Name (A-Z)</option>
@@ -49,6 +49,12 @@
             </tbody>
         </table>
     </div>
+
+    <div id="pagination">
+        <button id="prev-btn" class="btn btn-secondary"><i class="fas fa-chevron-left"></i></button>
+        <button id="next-btn" class="btn btn-secondary"><i class="fas fa-chevron-right"></i></button>
+    </div>
+
 </div>
 
 <style>
@@ -65,15 +71,38 @@
 <script>
     $(document).ready(function() {
         var itemsPerPage = 5; // Set initial value to 5
+        var currentPage = 0;
+        var rows = $("#games-table tbody tr");
+        var totalRows = rows.length;
+        var totalPages = Math.ceil(totalRows / itemsPerPage);
+
         $("#games-table tbody tr").hide(); // Hide all rows initially
         $("#games-table tbody tr").slice(0, itemsPerPage).show(); // Show first 5 rows
-    
+
         $("#items-per-page").change(function() {
             itemsPerPage = $(this).val();
+            currentPage = 0;
+            totalPages = Math.ceil(totalRows / itemsPerPage);
             $("#games-table tbody tr").hide();
-            $("#games-table tbody tr").slice(0, itemsPerPage).show();
+            $("#games-table tbody tr").slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage).show();
         });
-    
+
+        $("#prev-btn").click(function() {
+            if (currentPage > 0) {
+                currentPage--;
+                $("#games-table tbody tr").hide();
+                $("#games-table tbody tr").slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage).show();
+            }
+        });
+
+        $("#next-btn").click(function() {
+            if (currentPage < totalPages - 1) {
+                currentPage++;
+                $("#games-table tbody tr").hide();
+                $("#games-table tbody tr").slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage).show();
+            }
+        });
+
         $("#search").on("input", function() {
             var value = $(this).val().toLowerCase();
             $("#games-table tbody tr").filter(function() {
@@ -91,7 +120,7 @@
             $("#games-table tbody").html(sortedRows);
             $("#games-table tbody tr").slice(0, itemsPerPage).show(); // Reapply items per page after sorting
         });
-    
+
         document.querySelectorAll('.toggle-links').forEach(item => {
             item.addEventListener('click', event => {
                 const linksList = event.target.nextElementSibling;
@@ -106,3 +135,4 @@
     });
 </script>
 {% endblock %}
+

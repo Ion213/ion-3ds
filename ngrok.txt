@@ -1,0 +1,17 @@
+A4FZDA5AAQ
+V4V8345J4P
+ET3XP2ZVHW
+2D38SDTZ4F
+65FJ9Y9V83
+HFKMCWP8UB
+DMKV2CC3JK
+K7A6W2EPAT
+AKE8WMFQR9
+K3XKSPG9HY
+
+ssh -o "SetEnv SECRET=YQjFtCfPHMohYuiBmPNvFNVx" root@8lgm.segfault.net
+The authenticity of host '8lgm.segfault.net
+
+ngrok tunnel --label edge=edghts_2fig33lsXnEhqcTmt0OD8RYsY7B http://localhost:5000
+
+https://grouper-factual-monster.ngrok-free.app/

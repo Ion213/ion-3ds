@@ -8,6 +8,9 @@ pip install flask-login
 pip install pyrebase4
 pip install pytz
 
+pip install Flask-Limiter
+
+
 pip install Flask-Migrate
 flask db init
 flask db migrate -m "Your migration message"

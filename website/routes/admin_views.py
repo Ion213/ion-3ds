@@ -19,11 +19,13 @@ from flask_login import (
 
 from website import db
 from website.models.database_models import Games, Links
+from website.security.limiter import limiter 
 
 admin_views = Blueprint('admin_views', __name__)
 
 #add GAMES
 @admin_views.route('/add_games', methods=['GET', 'POST'])
+@limiter.limit("100 per minute")
 @login_required
 def add_games():
     if request.method == 'POST':
@@ -47,6 +49,7 @@ def add_games():
 
 #update games
 @admin_views.route('/update_game', methods=['POST'])
+@limiter.limit("100 per minute")
 @login_required
 def update_game():
     if request.method == 'POST':
@@ -75,6 +78,7 @@ def update_game():
 
 #DELETE GAMES
 @admin_views.route('/delete_game/<int:game_id>', methods=['POST'])
+@limiter.limit("100 per minute")
 @login_required
 def delete_game(game_id):
     if request.method == 'POST':
@@ -94,6 +98,7 @@ def delete_game(game_id):
 
 #ADD LINKS
 @admin_views.route('/add_links/<int:game_id>', methods=['GET', 'POST'])
+@limiter.limit("100 per minute")
 @login_required
 def add_links(game_id):
     game = Games.query.get(game_id)
@@ -117,6 +122,7 @@ def add_links(game_id):
 
 # Update LINKS
 @admin_views.route('/update_link/<int:link_id>', methods=['POST'])
+@limiter.limit("100 per minute")
 @login_required
 def update_link(link_id):
     if request.method == 'POST':
@@ -143,6 +149,7 @@ def update_link(link_id):
 
 #delete LINKS
 @admin_views.route('/delete_links/<int:link_id>', methods=['POST'])
+@limiter.limit("100 per minute")
 @login_required
 def delete_links(link_id):
     link = Links.query.get(link_id)
@@ -160,3 +167,4 @@ def delete_links(link_id):
                 flash(str(e), category='manage_links_error')
 
     return redirect(url_for('admin_views.add_links', game_id=link.game_id))
+#
