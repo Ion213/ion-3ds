@@ -1,0 +1,160 @@
+{% extends 'admin_base_top_nav.html' %}
+
+{% block title %}
+    MANAGE EVENT
+{% endblock %}
+
+{% block content %}
+
+<div>
+    <!-- jinjacode flash message form flask-->
+    {% with messages = get_flashed_messages(with_categories=true)%}
+        {%if messages%}
+            {%for category, message in messages%}
+            <!-- sweet alert error-->
+                {%if category =='manage_games_error'%}
+                    <div id="myAlert" class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{message}}
+                        <button type="button" class="close" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                <!-- sweet alert success-->
+                {% else %}
+                    <div id="myAlert" class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{message}}
+                        <button type="button" class="close" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</div>
+
+<div class="container mt-5">
+    <h1>Add GAME:</h1>
+    <form method="POST">
+        <div class="mb-3">
+            <label for="gamename" class="form-label">Game Name</label>
+            <input type="text" class="form-control" id="gamename" name="gamename" required>
+        </div>
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-plus"> ADD</i></button>
+        </div>
+    </form>
+</div>
+
+<div class="container mt-5">
+    <h1><i class="fas fa-trophy"></i>All GAMES:</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Game Titles</th>
+                <th>Links</th>
+                <th><i class="fas fa-cog"> Options</i></th>
+            </tr
+        </thead>
+        <tbody>
+            {% for game in games %}
+            <tr>
+                <td><i class="fas fa-compact-disc"> {{ game.game_name }}</i> </td>
+                <td><a href="{{ url_for('admin_views.add_links', game_id=game.id) }}"> <i class="fas fa-link">Links</i> </td>
+
+                <td>
+                    <form method="POST" action="/delete_game/{{ game.id }}">
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete {{game.game_name}}?')"><i class="fas fa-trash-alt"> Delete</i></button>
+                    </form>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#updateGameModal" onclick="showUpdateDialog('{{ game.id }}', '{{ game.game_name }}')"><i class="fas fa-edit"> Update</i></button>
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+        
+    </table>
+</div>
+
+<!-- Add this modal dialog at the end of your template -->
+<div class="modal fade" id="updateGameModal" tabindex="-1" aria-labelledby="updateGameModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateGameModalLabel">Update Game</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="updateGameForm" method="POST">
+                    <div class="mb-3">
+                        <label for="updateGameName" class="form-label">New Game Name</label>
+                        <input type="text" class="form-control" id="updateGameName" name="updateGameName" required>
+                    </div>
+                    <input type="hidden" id="updateGameId" name="updateGameId">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="updateGame()">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    //SWEET alert
+    document.addEventListener('DOMContentLoaded', function () {
+        var closeButton = document.querySelector('#myAlert .close');
+        if (closeButton) {
+            closeButton.addEventListener('click', function () {
+                var alert = document.querySelector('#myAlert');
+                if (alert) {
+                    alert.remove();
+                }
+            });
+        }
+    });
+    
+    //update dialogbox
+    function showUpdateDialog(gameId, gameName) {
+        document.getElementById('updateGameId').value = gameId;
+        document.getElementById('updateGameName').value = gameName;
+    }
+
+    function updateGame() {
+        var gameId = document.getElementById('updateGameId').value;
+        var newGameName = document.getElementById('updateGameName').value;
+
+        if (!newGameName.trim()) {
+            alert('Please enter a non-empty game name');
+            return;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '/update_game',
+            data: {
+                updateGameId: gameId,
+                updateGameName: newGameName
+            },
+            success: function(response) {
+                alert('Game updated successfully');
+                window.location.reload();
+            },
+            error: function(xhr, status, error) {
+                var errorMessage = '';
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    errorMessage = xhr.responseJSON.error;
+                } else {
+                    errorMessage = 'An error occurred while updating the game';
+                }
+                alert(errorMessage);
+            }
+        });
+
+        var updateGameModal = bootstrap.Modal.getInstance(document.getElementById('updateGameModal'));
+        updateGameModal.hide();
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends 'public_base_top_nav.html' %}
+{% block title %}
+    HOME
+{% endblock %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <h1><i class="fas fa-trophy"> ALL 3DS GAMES:</i> </h1>
+    <br/>
+    <label for="items-per-page">Items per page:</label>
+    <select id="items-per-page">
+        <option value="5">5</option>
+        <option value="10">10</option>
+        <option value="15">15</option>
+        <option value="20">20</option>
+    </select>
+    <br/><br/>
+    <input type="text" id="search" class="form-control" placeholder="Search...">
+    <br/><br/>
+    <div class="table-responsive">
+        <table class="table" id="games-table">
+            <thead>
+                <tr>
+                    <th scope="col">Game Name</th>
+                    <th scope="col"><i class="fas fa-link">Downlad Links</i></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for game in games %}
+                <tr>
+                    <td><i class="fas fa-gamepad"></i> {{ game.game_name }} </td>
+                    <td>
+                        <button class="btn btn-link toggle-links">Show Links</button>
+                        <ul class="hidden">
+                            {% for link in game.links %}
+                            <li> <a href="{{ link.url }}"><i class="fas fa-download"> LINK: {{ game.game_name }}</i></a></li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .hidden {
+        display: none;
+    }
+    table {
+        background-color: #631835; /* Light gray color */
+    }
+
+</style>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $("#items-per-page").change(function() {
+            var itemsPerPage = $(this).val();
+            $("#games-table tbody tr").hide();
+            $("#games-table tbody tr").slice(0, itemsPerPage).show();
+        });
+
+        $("#search").on("input", function() {
+            var value = $(this).val().toLowerCase();
+            $("#games-table tbody tr").filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+
+        document.querySelectorAll('.toggle-links').forEach(item => {
+            item.addEventListener('click', event => {
+                const linksList = event.target.nextElementSibling;
+                linksList.classList.toggle('hidden');
+                if (linksList.classList.contains('hidden')) {
+                    event.target.textContent = 'Show Links';
+                } else {
+                    event.target.textContent = 'Hide Links';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
