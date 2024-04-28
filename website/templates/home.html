@@ -16,6 +16,12 @@
         <option value="20">20</option>
     </select>
     <br/><br/>
+    <label for="sort-by">Sort by:</label>
+    <select id="sort-by">
+        <option value="game_name_asc">Game Name (A-Z)</option>
+        <option value="game_name_desc">Game Name (Z-A)</option>
+    </select>
+    <br/><br/>
     <input type="text" id="search" class="form-control" placeholder="Search...">
     <br/><br/>
     <div class="table-responsive">
@@ -58,12 +64,16 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {
+        var itemsPerPage = 5; // Set initial value to 5
+        $("#games-table tbody tr").hide(); // Hide all rows initially
+        $("#games-table tbody tr").slice(0, itemsPerPage).show(); // Show first 5 rows
+    
         $("#items-per-page").change(function() {
-            var itemsPerPage = $(this).val();
+            itemsPerPage = $(this).val();
             $("#games-table tbody tr").hide();
             $("#games-table tbody tr").slice(0, itemsPerPage).show();
         });
-
+    
         $("#search").on("input", function() {
             var value = $(this).val().toLowerCase();
             $("#games-table tbody tr").filter(function() {
@@ -71,6 +81,17 @@
             });
         });
 
+        $("#sort-by").change(function() {
+            var sortBy = $(this).val();
+            var sortedRows = $("#games-table tbody tr").get().sort(function(a, b) {
+                var aValue = $(a).find("td:eq(0)").text().toUpperCase();
+                var bValue = $(b).find("td:eq(0)").text().toUpperCase();
+                return (sortBy === "game_name_asc") ? (aValue > bValue ? 1 : -1) : (aValue < bValue ? 1 : -1);
+            });
+            $("#games-table tbody").html(sortedRows);
+            $("#games-table tbody tr").slice(0, itemsPerPage).show(); // Reapply items per page after sorting
+        });
+    
         document.querySelectorAll('.toggle-links').forEach(item => {
             item.addEventListener('click', event => {
                 const linksList = event.target.nextElementSibling;
